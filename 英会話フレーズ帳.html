@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="英会話フレーズ帳">
+<meta name="theme-color" content="#f48fb1">
+<title>🌸 英会話フレーズ帳</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(135deg,#fce4ec 0%,#f3e5f5 50%,#ede7f6 100%);min-height:100vh;font-family:'Hiragino Maru Gothic Pro','BIZ UDGothic',sans-serif;padding:12px 12px 60px}
+input,select,button,textarea{font-family:inherit;-webkit-appearance:none;appearance:none}
+::-webkit-scrollbar{display:none}
+.wrap{max-width:600px;margin:0 auto}
+
+/* Header */
+.header{background:linear-gradient(135deg,#f48fb1,#ce93d8);border-radius:24px;padding:16px 20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(206,147,216,.4);display:flex;align-items:center;justify-content:space-between}
+.header-text h1{font-size:19px;font-weight:bold;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.15)}
+.header-text p{margin-top:4px;font-size:14px;color:rgba(255,255,255,.85)}
+.header-corgi{text-align:center}
+.header-corgi p{font-size:10px;color:rgba(255,255,255,.9);font-weight:bold;margin-top:2px}
+
+/* Streak */
+.streak-bar{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px}
+.streak-card{background:#fff;border-radius:16px;padding:10px 20px;text-align:center;box-shadow:0 2px 10px rgba(206,147,216,.2);border:1.5px solid rgba(206,147,216,.3);flex:1}
+.streak-num{font-size:24px;font-weight:bold;color:#f48fb1}
+.streak-label{font-size:11px;color:#9e9e9e;margin-top:2px}
+
+/* Date nav */
+.date-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px}
+.date-nav button{background:rgba(255,255,255,.8);border:1.5px solid #e1bee7;border-radius:12px;width:36px;height:36px;font-size:18px;cursor:pointer;color:#ce93d8}
+.date-label{font-size:13px;color:#9c6fa4;font-weight:bold;text-align:center;min-width:120px}
+
+/* Phrase card */
+.phrase-card{background:#fff;border-radius:24px;padding:24px 20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(206,147,216,.25);border:2px solid rgba(206,147,216,.2);text-align:center;position:relative}
+.phrase-num{font-size:11px;color:#ce93d8;font-weight:bold;margin-bottom:10px;letter-spacing:2px}
+.phrase-en{font-size:22px;font-weight:bold;color:#5d4037;line-height:1.5;margin-bottom:8px}
+.phrase-kana{font-size:12px;color:#b39ddb;margin-bottom:10px;letter-spacing:1px}
+.phrase-ja{font-size:15px;color:#9c6fa4;font-weight:bold;margin-bottom:10px}
+.phrase-note{font-size:12px;color:#bdbdbd;line-height:1.6;margin-bottom:18px;padding:10px 14px;background:#fdf6ff;border-radius:12px;text-align:left}
+
+/* Play button */
+.btn-play{background:linear-gradient(135deg,#f48fb1,#ce93d8);border:none;border-radius:20px;padding:14px 32px;font-size:16px;font-weight:bold;color:#fff;cursor:pointer;box-shadow:0 4px 16px rgba(206,147,216,.45);display:flex;align-items:center;gap:8px;margin:0 auto 20px;transition:transform .1s}
+.btn-play:active{transform:scale(.96)}
+.btn-play.playing{background:linear-gradient(135deg,#ce93d8,#9575cd)}
+
+/* Done button */
+.btn-done{background:linear-gradient(135deg,#fce4ec,#f3e5f5);border:2px solid #f48fb1;border-radius:16px;padding:12px 24px;font-size:14px;font-weight:bold;color:#f48fb1;cursor:pointer;width:100%;transition:all .2s}
+.btn-done.done{background:linear-gradient(135deg,#f48fb1,#ce93d8);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(206,147,216,.4)}
+
+/* Praise */
+.praise-area{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,#fce4ec,#f3e5f5);border-radius:16px;display:none;text-align:center}
+.praise-area.show{display:block;animation:popIn .3s ease}
+@keyframes popIn{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.praise-text{font-size:15px;font-weight:bold;color:#c2185b;margin-top:6px}
+
+/* Phrase list */
+.section-title{font-size:13px;font-weight:bold;color:#9c6fa4;margin-bottom:8px;padding-left:4px}
+.phrase-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.phrase-row{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(206,147,216,.15);border:1.5px solid rgba(206,147,216,.2);display:flex;align-items:center;gap:10px}
+.phrase-row-num{font-size:11px;color:#ce93d8;font-weight:bold;min-width:28px}
+.phrase-row-text{flex:1;min-width:0}
+.phrase-row-en{font-size:14px;font-weight:bold;color:#5d4037}
+.phrase-row-ja{font-size:11px;color:#9c6fa4;margin-top:2px}
+.phrase-row-play{background:linear-gradient(135deg,#f8bbd0,#e1bee7);border:none;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;flex-shrink:0}
+.phrase-row.today{border-color:#f48fb1;background:linear-gradient(135deg,#fff9fb,#fdf6ff)}
+
+/* Add form */
+.add-card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 2px 10px rgba(206,147,216,.2);margin-bottom:16px}
+.add-card h3{font-size:14px;color:#7b1fa2;font-weight:bold;margin-bottom:12px}
+.form-label{font-size:12px;color:#9c6fa4;font-weight:bold;display:block;margin-bottom:3px}
+.form-input{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #e1bee7;font-size:14px;background:#fdf6ff;outline:none;color:#5d4037;margin-bottom:10px}
+textarea.form-input{resize:none;height:60px}
+.btn-addphrase{background:linear-gradient(135deg,#f48fb1,#ce93d8);color:#fff;border:none;border-radius:12px;padding:10px;font-size:14px;font-weight:bold;cursor:pointer;width:100%;box-shadow:0 2px 10px rgba(206,147,216,.4)}
+
+/* Footer */
+.footer{text-align:center;margin-top:20px;padding:10px;background:rgba(255,255,255,.6);border-radius:14px;font-size:14px;color:#ce93d8}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{flex:1;padding:8px;border-radius:14px;font-size:12px;font-weight:bold;cursor:pointer;text-align:center;background:#fff;color:#9c6fa4;border:1.5px solid #e1bee7}
+.tab.active{background:linear-gradient(135deg,#f48fb1,#ce93d8);color:#fff;border:none;box-shadow:0 2px 8px rgba(206,147,216,.4)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-text">
+      <h1>🌸 英会話フレーズ帳</h1>
+      <p>NHKラジオ英会話テーマ対応・<br>1日1フレーズ</p>
+    </div>
+    <div class="header-corgi">
+      <svg width="120" height="109" viewBox="0 0 320 290" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="160" cy="278" rx="88" ry="10" fill="rgba(200,160,220,0.22)"/>
+        <ellipse cx="160" cy="228" rx="88" ry="56" fill="#C8A070"/>
+        <ellipse cx="160" cy="236" rx="54" ry="42" fill="#FFF4E4"/>
+        <ellipse cx="160" cy="185" rx="44" ry="22" fill="#EDD8B8"/>
+        <rect x="96" y="248" width="30" height="24" rx="15" fill="#C8A070"/>
+        <ellipse cx="111" cy="272" rx="18" ry="9" fill="#B08858"/>
+        <ellipse cx="111" cy="274" rx="14" ry="6" fill="#FFF4E4"/>
+        <rect x="192" y="248" width="30" height="24" rx="15" fill="#C8A070"/>
+        <ellipse cx="207" cy="272" rx="18" ry="9" fill="#B08858"/>
+        <ellipse cx="207" cy="274" rx="14" ry="6" fill="#FFF4E4"/>
+        <path d="M 96,115 Q 58,58 76,10 Q 104,2 136,100 Z" fill="#A07848"/>
+        <path d="M 100,113 Q 68,62 82,18 Q 104,12 128,102 Z" fill="#F5C8B0"/>
+        <path d="M 224,115 Q 262,58 244,10 Q 216,2 184,100 Z" fill="#A07848"/>
+        <path d="M 220,113 Q 252,62 238,18 Q 216,12 192,102 Z" fill="#F5C8B0"/>
+        <ellipse cx="160" cy="128" rx="72" ry="65" fill="#C8A070"/>
+        <ellipse cx="160" cy="118" rx="22" ry="42" fill="#FFF4E4" opacity="0.75"/>
+        <ellipse cx="160" cy="158" rx="40" ry="28" fill="#FFF4E4"/>
+        <ellipse cx="122" cy="148" rx="16" ry="12" fill="#F0E4D0" opacity="0.6"/>
+        <ellipse cx="198" cy="148" rx="16" ry="12" fill="#F0E4D0" opacity="0.6"/>
+        <ellipse cx="128" cy="120" rx="15" ry="14" fill="white"/>
+        <ellipse cx="192" cy="120" rx="15" ry="14" fill="white"/>
+        <ellipse cx="131" cy="121" rx="11" ry="11" fill="#2A1600"/>
+        <ellipse cx="195" cy="121" rx="11" ry="11" fill="#2A1600"/>
+        <ellipse cx="131" cy="121" rx="8" ry="8" fill="#5A2E08"/>
+        <ellipse cx="195" cy="121" rx="8" ry="8" fill="#5A2E08"/>
+        <circle cx="136" cy="116" r="4" fill="white"/>
+        <circle cx="200" cy="116" r="4" fill="white"/>
+        <circle cx="128" cy="126" r="2" fill="white" opacity="0.55"/>
+        <circle cx="192" cy="126" r="2" fill="white" opacity="0.55"/>
+        <path d="M 114,117 Q 128,109 142,117" stroke="#2A1600" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 178,117 Q 192,109 206,117" stroke="#2A1600" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="128" cy="106" rx="9" ry="4" fill="#A07848" opacity="0.55"/>
+        <ellipse cx="192" cy="106" rx="9" ry="4" fill="#A07848" opacity="0.55"/>
+        <ellipse cx="160" cy="148" rx="14" ry="10" fill="#1A0E00"/>
+        <ellipse cx="156" cy="145" rx="5" ry="3.5" fill="white" opacity="0.3"/>
+        <line x1="160" y1="148" x2="160" y2="158" stroke="#1A0E00" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 144,160 Q 160,174 176,160" stroke="#906040" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="112" cy="136" rx="16" ry="10" fill="#FFB0C0" opacity="0.55"/>
+        <ellipse cx="208" cy="136" rx="16" ry="10" fill="#FFB0C0" opacity="0.55"/>
+        <ellipse cx="240" cy="198" rx="18" ry="12" fill="#C8A070" transform="rotate(-30 240 198)"/>
+        <ellipse cx="248" cy="190" rx="10" ry="7" fill="#FFF4E4" transform="rotate(-30 248 190)"/>
+        <g transform="translate(160,66)">
+          <ellipse cx="-38" cy="4" rx="14" ry="6" fill="#78C840" transform="rotate(-28 -38 4)"/>
+          <ellipse cx="38" cy="4" rx="14" ry="6" fill="#78C840" transform="rotate(28 38 4)"/>
+          <ellipse cx="-22" cy="-4" rx="10" ry="5" fill="#90D858" transform="rotate(-48 -22 -4)"/>
+          <ellipse cx="22" cy="-4" rx="10" ry="5" fill="#90D858" transform="rotate(48 22 -4)"/>
+          <g transform="translate(-40,0)"><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE" transform="rotate(72)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFC8DC" transform="rotate(144)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE" transform="rotate(216)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFC8DC" transform="rotate(288)"/><circle cx="0" cy="0" r="5" fill="#FFE8F0"/><circle cx="0" cy="0" r="2.5" fill="#FFB0C8"/></g>
+          <g transform="translate(0,-14)"><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898" transform="rotate(72)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFE4A8" transform="rotate(144)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898" transform="rotate(216)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFE4A8" transform="rotate(288)"/><circle cx="0" cy="0" r="5" fill="#FFF4D8"/><circle cx="0" cy="0" r="2.5" fill="#FFD070"/></g>
+          <g transform="translate(40,0)"><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF" transform="rotate(72)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#D8BEFF" transform="rotate(144)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF" transform="rotate(216)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#D8BEFF" transform="rotate(288)"/><circle cx="0" cy="0" r="5" fill="#EEE0FF"/><circle cx="0" cy="0" r="2.5" fill="#C0A0F0"/></g>
+        </g>
+      </svg>
+      <p>おうえんしてるよ🐾</p>
+    </div>
+  </div>
+
+  <!-- Streak -->
+  <div class="streak-bar">
+    <div class="streak-card">
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-label">🔥 連続練習日数</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-num" id="totalNum">0</div>
+      <div class="streak-label">✨ 累計練習回数</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" id="tab1" onclick="switchTab(1)">📖 今日のフレーズ</div>
+    <div class="tab" id="tab2" onclick="switchTab(2)">📋 フレーズ一覧</div>
+    <div class="tab" id="tab3" onclick="switchTab(3)">➕ フレーズ追加</div>
+  </div>
+
+  <!-- Tab1: Today -->
+  <div id="view1">
+    <div class="date-nav">
+      <button onclick="changeDay(-1)">‹</button>
+      <div class="date-label" id="dateLabel"></div>
+      <button onclick="changeDay(1)">›</button>
+    </div>
+
+    <div class="phrase-card" id="phraseCard">
+      <div class="phrase-num" id="phraseNum"></div>
+      <div class="phrase-en" id="phraseEn"></div>
+      <div class="phrase-kana" id="phraseKana"></div>
+      <div class="phrase-ja" id="phraseJa"></div>
+      <div class="phrase-note" id="phraseNote"></div>
+      <button class="btn-play" id="btnPlay" onclick="playPhrase()">
+        🔊 ネイティブ発音を聴く
+      </button>
+      <button class="btn-done" id="btnDone" onclick="markDone()">
+        ✅ 今日の練習完了！
+      </button>
+      <div class="praise-area" id="praiseArea">
+        <div id="praiseCorgi"></div>
+        <div class="praise-text" id="praiseText"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab2: List -->
+  <div id="view2" style="display:none">
+    <div class="phrase-list" id="phraseListEl"></div>
+  </div>
+
+  <!-- Tab3: Add -->
+  <div id="view3" style="display:none">
+    <div class="add-card">
+      <h3>🌸 フレーズを追加する</h3>
+      <label class="form-label">英語フレーズ *</label>
+      <input class="form-input" type="text" id="aEn" placeholder="例: That makes sense.">
+      <label class="form-label">読み方（カタカナ）</label>
+      <input class="form-input" type="text" id="aKana" placeholder="例: ザット メイクス センス">
+      <label class="form-label">日本語訳 *</label>
+      <input class="form-input" type="text" id="aJa" placeholder="例: なるほど。">
+      <label class="form-label">使い方・メモ</label>
+      <textarea class="form-input" id="aNote" placeholder="例: 相手の説明を理解したときに使う表現。"></textarea>
+      <button class="btn-addphrase" onclick="addPhrase()">🌸 追加する</button>
+    </div>
+  </div>
+
+  <div class="footer">🐾 コーギーと一緒に毎日1フレーズ！<br>続けることが大事だよ 🌸</div>
+</div>
+
+<script>
+var STORAGE_KEY='kogimama-english-v1';
+var PHRASES_KEY='kogimama-english-phrases-v1';
+// NHKラジオ英会話 2026年度 4月テーマ対応フレーズ
+// テーマ：初対面・あいさつ・祝福・お悔やみ・会話のきっかけ・話し合い
+var DEFAULT_PHRASES=[
+  /* ── 初対面・あいさつ ── */
+  {en:"Nice to meet you. I've heard so much about you.",kana:"ナイス トゥー ミート ユー。アイブ ハード ソー マッチ アバウト ユー",ja:"はじめまして。お噂はかねがね。",note:"初対面の定番フレーズ。「お噂はかねがね」と加えると会話が自然に広がる。"},
+  {en:"Long time no see! How have you been?",kana:"ロング タイム ノー シー！ハウ ハブ ユー ビーン？",ja:"久しぶり！元気でした？",note:"旧友や知人との再会に使う親しみやすい挨拶。日本語の「久しぶり！」にぴったり対応する表現。"},
+  {en:"What a small world!",kana:"ワット ア スモール ワールド！",ja:"世界は狭いですね！",note:"思いがけない場所で知人に会ったときの驚きと喜びを表す定番フレーズ。"},
+  {en:"Please, call me [your name].",kana:"プリーズ コール ミー [ユア ネーム]",ja:"[名前]と呼んでください。",note:"初対面で名前を伝えるときの自然な表現。ファーストネームで呼んでもらいたいときに使う。"},
+  {en:"It's so good to see you again.",kana:"イッツ ソー グッド トゥー シー ユー アゲン",ja:"また会えてうれしいです。",note:"久しぶりに会った相手への温かい挨拶。It's great / wonderful と置き換えても自然。"},
+  /* ── 会話のきっかけ ── */
+  {en:"What do you do for a living?",kana:"ワット ドゥー ユー ドゥー フォー ア リビング？",ja:"お仕事は何をされていますか？",note:"相手の職業を尋ねる自然な会話の入口。What's your job? よりも丁寧でナチュラルな表現。"},
+  {en:"What brings you here today?",kana:"ワット ブリングズ ユー ヒア トゥデイ？",ja:"今日はどのようなご用件で？",note:"来た目的や理由を尋ねる表現。What's the occasion? と同様の意味で使える。"},
+  {en:"Have you been here before?",kana:"ハブ ユー ビーン ヒア ビフォー？",ja:"こちらは初めてですか？",note:"場所やイベントへの親しみを確認するフレーズ。会話のきっかけとして使いやすい。"},
+  {en:"Mind if I join you?",kana:"マインド イフ アイ ジョイン ユー？",ja:"一緒に座ってもいいですか？",note:"相手のそばに席をとりたいときの丁寧な表現。Do you mind if I...? の短縮形。"},
+  {en:"How do you know each other?",kana:"ハウ ドゥー ユー ノー イーチ アザー？",ja:"どういうご関係ですか？",note:"共通の知人との関係を確認するフレーズ。パーティーや集まりの場でよく使われる。"},
+  /* ── 祝福 ── */
+  {en:"Congratulations! You really deserve it.",kana:"コングラチュレーションズ！ユー リアリー ディザーブ イット",ja:"おめでとう！あなたの実力ですよ。",note:"相手の努力と成果を認める祝福の言葉。You deserve it. を加えると「頑張ったから当然だ」という意味になる。"},
+  {en:"I'm so happy for you!",kana:"アイム ソー ハッピー フォー ユー！",ja:"本当によかったですね！",note:"相手の喜びを自分のことのように喜ぶ表現。for you がポイントで「あなたのために嬉しい」というニュアンス。"},
+  {en:"That's wonderful news!",kana:"ザッツ ワンダフル ニューズ！",ja:"それは素晴らしいニュースですね！",note:"嬉しい知らせを聞いたときの自然な反応。That's great / fantastic! にも言い換えられる。"},
+  {en:"I'm so proud of you!",kana:"アイム ソー プラウド オブ ユー！",ja:"本当に誇りに思います！",note:"子どもや生徒、親しい友人の成果をたたえる温かい表現。教師・親がよく使う。"},
+  {en:"Wishing you all the best!",kana:"ウィッシング ユー オール ザ ベスト！",ja:"すべてうまくいくことを願っています！",note:"新しいスタートや挑戦に臨む相手へのエールの言葉。メッセージカードにもよく使われる表現。"},
+  /* ── お悔やみ ── */
+  {en:"I'm so sorry for your loss.",kana:"アイム ソー ソーリー フォー ユア ロス",ja:"ご愁傷様です。",note:"身近な人を亡くした相手への定番のお悔やみ表現。英語でのお悔やみの最も基本的なフレーズ。"},
+  {en:"Please accept my deepest sympathies.",kana:"プリーズ アクセプト マイ ディーペスト シンパシーズ",ja:"心よりお悔やみ申し上げます。",note:"フォーマルな場面でのお悔やみ表現。My condolences. も同じ意味で使える。"},
+  {en:"I'm thinking of you during this difficult time.",kana:"アイム シンキング オブ ユー デューリング ディス ディフィカルト タイム",ja:"この大変な時期、あなたのことを思っています。",note:"辛い時期に寄り添う気持ちを伝える表現。直接何かしてあげられなくても使える温かい言葉。"},
+  /* ── 話し合いを求める ── */
+  {en:"Do you have a moment?",kana:"ドゥー ユー ハブ ア モーメント？",ja:"少しよろしいですか？",note:"相手の時間を確認する丁寧な表現。Are you free now? よりも柔らかいニュアンス。"},
+  {en:"I need to talk to you about something.",kana:"アイ ニード トゥー トーク トゥー ユー アバウト サムシング",ja:"少しお話しがあるのですが。",note:"大切な話を切り出す前置き表現。「ちょっといいですか？」に近いニュアンス。"},
+  {en:"Could we talk about this later?",kana:"クッド ウィー トーク アバウト ディス レイター？",ja:"後でこの話ができますか？",note:"今すぐではなく、後で話し合いを持ちかける柔らかい表現。"},
+  {en:"Can we discuss this over coffee?",kana:"キャン ウィー ディスカス ディス オーバー コーヒー？",ja:"コーヒーを飲みながら話しませんか？",note:"カジュアルな話し合いを提案する表現。緊張感を和らげながら話を進めたいときに便利。"},
+  /* ── 感情を伝える ── */
+  {en:"That must have been tough.",kana:"ザット マスト ハブ ビーン タフ",ja:"それはつらかったでしょうね。",note:"相手の苦労や辛さに共感する表現。I'm sorry to hear that. と合わせて使うと更に自然。"},
+  {en:"You must be excited!",kana:"ユー マスト ビー エキサイテッド！",ja:"ワクワクしているでしょうね！",note:"相手の嬉しそうな気持ちを察して共感する表現。must be + 感情 の形で使われる。"},
+  {en:"That means a lot to me.",kana:"ザット ミーンズ ア ロット トゥー ミー",ja:"それはとても嬉しいです。",note:"相手の言葉や行動を深く感謝するときの表現。It means a lot. だけでも伝わる。"},
+  {en:"I can't thank you enough.",kana:"アイ キャント サンク ユー イナフ",ja:"何とお礼を言っていいか。",note:"Thank you so much より深い感謝を伝えるフレーズ。「どれだけ感謝しても足りない」というニュアンス。"},
+  {en:"I feel the same way.",kana:"アイ フィール ザ セイム ウェイ",ja:"私も同じ気持ちです。",note:"相手と同じ感情や意見を共有していることを伝える表現。共感と連帯感を示す言葉。"},
+  /* ── 会話の締め ── */
+  {en:"It was great running into you!",kana:"イット ワズ グレート ランニング イントゥー ユー！",ja:"会えてよかったです！",note:"偶然の再会を喜ぶ表現。run into は「偶然出会う」という意味のイディオム。"},
+  {en:"Let's keep in touch!",kana:"レッツ キープ イン タッチ！",ja:"また連絡しましょう！",note:"別れ際に今後のつながりを確認する表現。Stay in touch! とも言う。"},
+  {en:"It's been a pleasure talking with you.",kana:"イッツ ビーン ア プレジャー トーキング ウィズ ユー",ja:"お話しできて光栄でした。",note:"会話の終わりに礼儀正しく締めるフレーズ。フォーマルからカジュアルまで幅広く使える。"}
+];
+
+var phrases=[], data={};
+try{
+  var sp=localStorage.getItem(PHRASES_KEY);
+  phrases=sp?JSON.parse(sp):DEFAULT_PHRASES.slice();
+}catch(e){phrases=DEFAULT_PHRASES.slice();}
+try{
+  var sd=localStorage.getItem(STORAGE_KEY);
+  data=sd?JSON.parse(sd):{streak:0,total:0,lastDate:'',doneDates:[]};
+}catch(e){data={streak:0,total:0,lastDate:'',doneDates:[]};}
+
+function savePhrases(){try{localStorage.setItem(PHRASES_KEY,JSON.stringify(phrases));}catch(e){}}
+function saveData(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch(e){}}
+
+var viewingOffset=0; // 0=today, -1=yesterday, etc.
+
+function getDateStr(offset){
+  var d=new Date();
+  d.setDate(d.getDate()+(offset||0));
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+}
+function getDateLabel(offset){
+  var d=new Date();
+  d.setDate(d.getDate()+(offset||0));
+  var days=['日','月','火','水','木','金','土'];
+  return (d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
+}
+function getPhraseIndex(offset){
+  var d=new Date();
+  d.setDate(d.getDate()+(offset||0));
+  var base=new Date(2026,3,8);
+  var diff=Math.floor((d-base)/86400000);
+  var idx=((diff%phrases.length)+phrases.length)%phrases.length;
+  return idx;
+}
+
+var PRAISES=[
+  {emoji:"🐾",text:"すごい！今日もよくできました！"},
+  {emoji:"🌸",text:"ネイティブみたいでかっこいい！"},
+  {emoji:"✨",text:"毎日続けてえらい！この調子！"},
+  {emoji:"🎉",text:"完璧！どんどん上手になってるよ！"},
+  {emoji:"💪",text:"やったね！継続は力なり！"},
+  {emoji:"🌟",text:"素晴らしい！コーギーも大喜び！"},
+  {emoji:"🍀",text:"今日も一歩前進！応援してるよ！"},
+  {emoji:"👑",text:"最高！英語マスターへの道まっしぐら！"}
+];
+
+function renderToday(){
+  var idx=getPhraseIndex(viewingOffset);
+  var p=phrases[idx];
+  var ds=getDateStr(viewingOffset);
+  var isToday=viewingOffset===0;
+  var isDone=data.doneDates&&data.doneDates.indexOf(ds)>=0;
+
+  document.getElementById('dateLabel').textContent=getDateLabel(viewingOffset);
+  document.getElementById('phraseNum').textContent='フレーズ No.'+(idx+1)+' / '+phrases.length;
+  document.getElementById('phraseEn').textContent=p.en;
+  document.getElementById('phraseKana').textContent=p.kana||'';
+  document.getElementById('phraseJa').textContent=p.ja;
+  document.getElementById('phraseNote').textContent=p.note||'';
+
+  var btn=document.getElementById('btnDone');
+  var praise=document.getElementById('praiseArea');
+  if(isDone){
+    btn.textContent='🌸 練習済み！';
+    btn.className='btn-done done';
+    praise.className='praise-area show';
+  } else {
+    btn.textContent='✅ 今日の練習完了！';
+    btn.className='btn-done';
+    praise.className='praise-area';
+  }
+  if(!isToday){
+    btn.style.display='none';
+  } else {
+    btn.style.display='block';
+  }
+
+  document.getElementById('streakNum').textContent=data.streak||0;
+  document.getElementById('totalNum').textContent=data.total||0;
+}
+
+function changeDay(d){
+  viewingOffset+=d;
+  if(viewingOffset>0)viewingOffset=0;
+  renderToday();
+}
+
+/* ── 音声再生: Web Speech API（英語音声を確実に選択） ── */
+function pickEnglishVoice(voices){
+  // 日本語・中国語・韓国語などの非英語音声を除外した英語音声リスト
+  var enVoices=voices.filter(function(v){
+    return v.lang.startsWith('en') && !/^(ja|zh|ko|fr|de|es|it|pt|ru|ar)/.test(v.lang);
+  });
+  // クリアな米国英語女性音声を優先
+  return enVoices.find(function(v){return /Samantha/i.test(v.name);})
+    || enVoices.find(function(v){return /Karen|Ava|Allison|Victoria|Moira|Tessa/i.test(v.name);})
+    || enVoices.find(function(v){return v.lang==='en-US';})
+    || enVoices.find(function(v){return v.lang==='en-GB';})
+    || enVoices[0]
+    || null;
+}
+
+function doSpeak(text, onEnd){
+  if(!window.speechSynthesis){if(onEnd)onEnd();return;}
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang='en-US';
+  u.rate=0.75;
+  u.pitch=1.45;
+  var voice=pickEnglishVoice(window.speechSynthesis.getVoices());
+  if(voice)u.voice=voice;
+  // ボタンが永遠に「再生中」にならないよう10秒でタイムアウト
+  var timer=setTimeout(function(){window.speechSynthesis.cancel();if(onEnd)onEnd();},10000);
+  u.onend=function(){clearTimeout(timer);if(onEnd)onEnd();};
+  u.onerror=function(){clearTimeout(timer);if(onEnd)onEnd();};
+  window.speechSynthesis.speak(u);
+}
+
+function speakText(text, onEnd){
+  if(!window.speechSynthesis){if(onEnd)onEnd();return;}
+  var voices=window.speechSynthesis.getVoices();
+  if(voices&&voices.length>0){
+    doSpeak(text,onEnd);
+  } else {
+    // 音声リストがまだ読み込まれていない場合は読み込み完了を待つ
+    var waited=false;
+    var fallbackTimer=setTimeout(function(){if(!waited){waited=true;doSpeak(text,onEnd);}},1200);
+    window.speechSynthesis.onvoiceschanged=function(){
+      if(waited)return;
+      waited=true;
+      clearTimeout(fallbackTimer);
+      window.speechSynthesis.onvoiceschanged=null;
+      doSpeak(text,onEnd);
+    };
+  }
+}
+
+function playPhrase(){
+  var idx=getPhraseIndex(viewingOffset);
+  var p=phrases[idx];
+  var btn=document.getElementById('btnPlay');
+  btn.textContent='🔊 再生中...';
+  btn.className='btn-play playing';
+  speakText(p.en,function(){btn.textContent='🔊 ネイティブ発音を聴く';btn.className='btn-play';});
+}
+
+function markDone(){
+  var ds=getDateStr(0);
+  if(!data.doneDates)data.doneDates=[];
+  if(data.doneDates.indexOf(ds)>=0)return;
+  data.doneDates.push(ds);
+  data.total=(data.total||0)+1;
+
+  // streak計算
+  var yesterday=getDateStr(-1);
+  if(data.lastDate===yesterday||data.lastDate===ds){
+    if(data.lastDate!==ds)data.streak=(data.streak||0)+1;
+  } else {
+    data.streak=1;
+  }
+  data.lastDate=ds;
+  saveData();
+
+  var pr=PRAISES[Math.floor(Math.random()*PRAISES.length)];
+  document.getElementById('praiseCorgi').textContent=pr.emoji+' ';
+  document.getElementById('praiseText').textContent=pr.text;
+  document.getElementById('btnDone').textContent='🌸 練習済み！';
+  document.getElementById('btnDone').className='btn-done done';
+  document.getElementById('praiseArea').className='praise-area show';
+  document.getElementById('streakNum').textContent=data.streak;
+  document.getElementById('totalNum').textContent=data.total;
+}
+
+function renderList(){
+  var todayIdx=getPhraseIndex(0);
+  var el=document.getElementById('phraseListEl');
+  el.innerHTML=phrases.map(function(p,i){
+    var isToday=(i===todayIdx);
+    return '<div class="phrase-row'+(isToday?' today':'')+'">'+
+      '<div class="phrase-row-num">'+(isToday?'📌':'No.'+(i+1))+'</div>'+
+      '<div class="phrase-row-text">'+
+        '<div class="phrase-row-en">'+esc(p.en)+'</div>'+
+        '<div class="phrase-row-ja">'+esc(p.ja)+'</div>'+
+      '</div>'+
+      '<button class="phrase-row-play" onclick="playIdx('+i+')">🔊</button>'+
+    '</div>';
+  }).join('');
+}
+
+function playIdx(i){
+  speakText(phrases[i].en, null);
+}
+
+function addPhrase(){
+  var en=document.getElementById('aEn').value.trim();
+  var ja=document.getElementById('aJa').value.trim();
+  if(!en||!ja)return;
+  phrases.push({
+    en:en,
+    kana:document.getElementById('aKana').value.trim(),
+    ja:ja,
+    note:document.getElementById('aNote').value.trim()
+  });
+  savePhrases();
+  document.getElementById('aEn').value='';
+  document.getElementById('aKana').value='';
+  document.getElementById('aJa').value='';
+  document.getElementById('aNote').value='';
+  alert('追加しました！フレーズ一覧で確認できます🌸');
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function switchTab(n){
+  document.getElementById('view1').style.display=n===1?'block':'none';
+  document.getElementById('view2').style.display=n===2?'block':'none';
+  document.getElementById('view3').style.display=n===3?'block':'none';
+  document.getElementById('tab1').className='tab'+(n===1?' active':'');
+  document.getElementById('tab2').className='tab'+(n===2?' active':'');
+  document.getElementById('tab3').className='tab'+(n===3?' active':'');
+  if(n===2)renderList();
+}
+
+renderToday();
+</script>
+</body>
+</html>

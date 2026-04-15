@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="食品期限帳">
+<meta name="theme-color" content="#f48fb1">
+<title>🌸 食品期限かんり帳</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(135deg,#fce4ec 0%,#f3e5f5 50%,#ede7f6 100%);min-height:100vh;font-family:'Hiragino Maru Gothic Pro','BIZ UDGothic',sans-serif;padding:12px 12px 60px}
+input,select,button{font-family:inherit;-webkit-appearance:none;appearance:none}
+::-webkit-scrollbar{display:none}
+.wrap{max-width:600px;margin:0 auto}
+.header{background:linear-gradient(135deg,#f48fb1,#ce93d8);border-radius:24px;padding:16px 20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(206,147,216,.4);display:flex;align-items:center;justify-content:space-between}
+.header-text h1{font-size:20px;font-weight:bold;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.15)}
+.header-text p{margin-top:4px;font-size:11px;color:rgba(255,255,255,.85)}
+.header-corgi{text-align:center}
+.header-corgi p{font-size:10px;color:rgba(255,255,255,.9);font-weight:bold;margin-top:2px}
+.stats{display:flex;gap:10px;margin-bottom:14px}
+.stat-card{flex:1;background:#fff;border-radius:16px;padding:10px 6px;text-align:center;box-shadow:0 2px 10px rgba(206,147,216,.2);border:1.5px solid rgba(206,147,216,.3)}
+.stat-card.warn{background:#fce4ec}
+.stat-num{font-size:20px;font-weight:bold}
+.stat-label{font-size:10px;color:#9e9e9e;margin-top:2px}
+.search-row{display:flex;gap:8px;margin-bottom:12px}
+.search-wrap{flex:1;position:relative}
+.search-wrap span{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+.search-wrap input{width:100%;padding:10px 10px 10px 32px;border-radius:12px;border:1.5px solid #e1bee7;font-size:14px;background:#fff;outline:none;color:#5d4037}
+.btn-add{background:linear-gradient(135deg,#f48fb1,#ce93d8);color:#fff;border:none;border-radius:12px;padding:10px 16px;font-size:14px;font-weight:bold;cursor:pointer;box-shadow:0 2px 10px rgba(206,147,216,.4);white-space:nowrap}
+.tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px}
+.tab{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:bold;cursor:pointer;white-space:nowrap;background:#fff;color:#9c6fa4;border:1.5px solid #e1bee7;box-shadow:0 1px 4px rgba(206,147,216,.2)}
+.tab.active{background:linear-gradient(135deg,#f48fb1,#ce93d8);color:#fff;border:none;box-shadow:0 2px 8px rgba(206,147,216,.4)}
+.sort-row{display:flex;gap:10px;margin-bottom:12px;align-items:center}
+.sort-row select{padding:6px 10px;border-radius:10px;border:1.5px solid #e1bee7;font-size:12px;background:#fff;color:#7b1fa2;outline:none}
+.sort-row label{display:flex;align-items:center;gap:5px;font-size:12px;color:#9c6fa4;cursor:pointer}
+.sort-row label input{accent-color:#f48fb1;width:14px;height:14px}
+.count{margin-left:auto;font-size:11px;color:#b39ddb}
+.item-list{display:flex;flex-direction:column;gap:8px}
+.item-card{background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 2px 10px rgba(206,147,216,.18);border:2px solid rgba(206,147,216,.2);display:flex;align-items:center;gap:10px}
+.item-card.urgent{border-color:#f8bbd0}
+.item-icon{width:40px;height:40px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#fce4ec,#f3e5f5);display:flex;align-items:center;justify-content:center;font-size:20px}
+.item-info{flex:1;min-width:0}
+.item-name-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.item-name{font-size:15px;font-weight:bold;color:#5d4037}
+.item-type{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:bold}
+.item-type.shohi{background:#fce4ec;color:#e57373}
+.item-type.shomi{background:#ede7f6;color:#9c6fa4}
+.item-meta{font-size:11px;color:#9e9e9e;margin-top:2px}
+.status-badge{border-radius:10px;padding:5px 8px;text-align:center;flex-shrink:0;font-size:11px;font-weight:bold;min-width:56px}
+.status-emoji{font-size:14px}
+.item-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.btn-edit{background:linear-gradient(135deg,#f8bbd0,#e1bee7);border:none;border-radius:8px;padding:4px 9px;font-size:11px;cursor:pointer;color:#7b1fa2;font-weight:bold}
+.btn-del{background:#f5f5f5;border:none;border-radius:8px;padding:4px 9px;font-size:11px;cursor:pointer;color:#e57373;font-weight:bold}
+.empty{text-align:center;padding:36px 20px;background:#fff;border-radius:20px;color:#ce93d8;font-size:14px;box-shadow:0 2px 10px rgba(206,147,216,.15)}
+.empty-icon{font-size:36px;margin-bottom:8px}
+.footer{text-align:center;margin-top:20px;padding:10px;background:rgba(255,255,255,.6);border-radius:14px;font-size:11px;color:#ce93d8}
+.overlay{position:fixed;inset:0;background:rgba(180,120,200,.35);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;z-index:100}
+.overlay.center{align-items:center;padding:20px}
+.sheet{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-width:540px;box-shadow:0 -8px 40px rgba(206,147,216,.4)}
+.sheet-handle{width:40px;height:4px;background:#e1bee7;border-radius:2px;margin:0 auto 20px}
+.sheet h2{margin:0 0 18px;font-size:17px;color:#7b1fa2;text-align:center}
+.form-label{font-size:12px;color:#9c6fa4;font-weight:bold;display:block;margin-bottom:3px}
+.form-input{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #e1bee7;font-size:15px;background:#fdf6ff;outline:none;color:#5d4037;margin-bottom:12px}
+.form-row{display:flex;gap:10px;margin-bottom:12px}
+.form-row>div{flex:1}
+.form-btns{display:flex;gap:10px;margin-top:8px}
+.btn-cancel{flex:1;padding:13px;border-radius:14px;border:1.5px solid #e1bee7;background:#fff;color:#9c6fa4;font-size:15px;cursor:pointer}
+.btn-save{flex:2;padding:13px;border-radius:14px;border:none;background:linear-gradient(135deg,#f48fb1,#ce93d8);color:#fff;font-size:15px;font-weight:bold;cursor:pointer;box-shadow:0 2px 10px rgba(206,147,216,.4)}
+.dialog{background:#fff;border-radius:24px;padding:28px;max-width:320px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(206,147,216,.4)}
+.dialog-icon{font-size:40px;margin-bottom:10px}
+.dialog p{font-size:15px;color:#5d4037;margin-bottom:20px}
+.dialog-btns{display:flex;gap:10px}
+.btn-cancel2{flex:1;padding:12px;border-radius:12px;border:1.5px solid #e1bee7;background:#fff;color:#9c6fa4;font-size:14px;cursor:pointer}
+.btn-del2{flex:1;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#ef9a9a,#f48fb1);color:#fff;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-camera{width:100%;padding:13px;border-radius:14px;border:2px dashed #ce93d8;background:linear-gradient(135deg,#fdf6ff,#fce4ec);color:#9c6fa4;font-size:14px;font-weight:bold;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none}
+.ocr-loading{text-align:center;padding:10px;color:#ce93d8;font-size:13px;display:none;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.ocr-msg{background:linear-gradient(135deg,#f3e5f5,#fce4ec);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#7b1fa2;display:none;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-text">
+      <h1>🌸 食品期限かんり帳</h1>
+      <p>冷蔵庫・パントリーの賞味期限・消費期限を管理</p>
+    </div>
+    <div class="header-corgi">
+      <svg width="130" height="118" viewBox="0 0 320 290" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="160" cy="278" rx="88" ry="10" fill="rgba(200,160,220,0.22)"/>
+        <ellipse cx="160" cy="228" rx="88" ry="56" fill="#C8A070"/>
+        <ellipse cx="160" cy="236" rx="54" ry="42" fill="#FFF4E4"/>
+        <ellipse cx="160" cy="185" rx="44" ry="22" fill="#EDD8B8"/>
+        <rect x="96" y="248" width="30" height="24" rx="15" fill="#C8A070"/>
+        <ellipse cx="111" cy="272" rx="18" ry="9" fill="#B08858"/>
+        <ellipse cx="111" cy="274" rx="14" ry="6" fill="#FFF4E4"/>
+        <rect x="192" y="248" width="30" height="24" rx="15" fill="#C8A070"/>
+        <ellipse cx="207" cy="272" rx="18" ry="9" fill="#B08858"/>
+        <ellipse cx="207" cy="274" rx="14" ry="6" fill="#FFF4E4"/>
+        <path d="M 96,115 Q 58,58 76,10 Q 104,2 136,100 Z" fill="#A07848"/>
+        <path d="M 100,113 Q 68,62 82,18 Q 104,12 128,102 Z" fill="#F5C8B0"/>
+        <path d="M 224,115 Q 262,58 244,10 Q 216,2 184,100 Z" fill="#A07848"/>
+        <path d="M 220,113 Q 252,62 238,18 Q 216,12 192,102 Z" fill="#F5C8B0"/>
+        <ellipse cx="160" cy="128" rx="72" ry="65" fill="#C8A070"/>
+        <ellipse cx="160" cy="118" rx="22" ry="42" fill="#FFF4E4" opacity="0.75"/>
+        <ellipse cx="160" cy="158" rx="40" ry="28" fill="#FFF4E4"/>
+        <ellipse cx="122" cy="148" rx="16" ry="12" fill="#F0E4D0" opacity="0.6"/>
+        <ellipse cx="198" cy="148" rx="16" ry="12" fill="#F0E4D0" opacity="0.6"/>
+        <ellipse cx="128" cy="120" rx="15" ry="14" fill="white"/>
+        <ellipse cx="192" cy="120" rx="15" ry="14" fill="white"/>
+        <ellipse cx="131" cy="121" rx="11" ry="11" fill="#2A1600"/>
+        <ellipse cx="195" cy="121" rx="11" ry="11" fill="#2A1600"/>
+        <ellipse cx="131" cy="121" rx="8" ry="8" fill="#5A2E08"/>
+        <ellipse cx="195" cy="121" rx="8" ry="8" fill="#5A2E08"/>
+        <circle cx="136" cy="116" r="4" fill="white"/>
+        <circle cx="200" cy="116" r="4" fill="white"/>
+        <circle cx="128" cy="126" r="2" fill="white" opacity="0.55"/>
+        <circle cx="192" cy="126" r="2" fill="white" opacity="0.55"/>
+        <path d="M 114,117 Q 128,109 142,117" stroke="#2A1600" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 178,117 Q 192,109 206,117" stroke="#2A1600" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="128" cy="106" rx="9" ry="4" fill="#A07848" opacity="0.55"/>
+        <ellipse cx="192" cy="106" rx="9" ry="4" fill="#A07848" opacity="0.55"/>
+        <ellipse cx="160" cy="148" rx="14" ry="10" fill="#1A0E00"/>
+        <ellipse cx="156" cy="145" rx="5" ry="3.5" fill="white" opacity="0.3"/>
+        <line x1="160" y1="148" x2="160" y2="158" stroke="#1A0E00" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 144,160 Q 160,174 176,160" stroke="#906040" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="112" cy="136" rx="16" ry="10" fill="#FFB0C0" opacity="0.55"/>
+        <ellipse cx="208" cy="136" rx="16" ry="10" fill="#FFB0C0" opacity="0.55"/>
+        <ellipse cx="240" cy="198" rx="18" ry="12" fill="#C8A070" transform="rotate(-30 240 198)"/>
+        <ellipse cx="248" cy="190" rx="10" ry="7" fill="#FFF4E4" transform="rotate(-30 248 190)"/>
+        <g transform="translate(160,66)">
+          <ellipse cx="-38" cy="4" rx="14" ry="6" fill="#78C840" transform="rotate(-28 -38 4)"/>
+          <ellipse cx="38" cy="4" rx="14" ry="6" fill="#78C840" transform="rotate(28 38 4)"/>
+          <ellipse cx="-22" cy="-4" rx="10" ry="5" fill="#90D858" transform="rotate(-48 -22 -4)"/>
+          <ellipse cx="22" cy="-4" rx="10" ry="5" fill="#90D858" transform="rotate(48 22 -4)"/>
+          <g transform="translate(-40,0)">
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFC8DC" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFC8DC" transform="rotate(288)"/>
+            <circle cx="0" cy="0" r="5" fill="#FFE8F0"/>
+            <circle cx="0" cy="0" r="2.5" fill="#FFB0C8"/>
+          </g>
+          <g transform="translate(0,-14)">
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFE4A8" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFE4A8" transform="rotate(288)"/>
+            <circle cx="0" cy="0" r="5" fill="#FFF4D8"/>
+            <circle cx="0" cy="0" r="2.5" fill="#FFD070"/>
+          </g>
+          <g transform="translate(40,0)">
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#D8BEFF" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-9" rx="6" ry="10" fill="#D8BEFF" transform="rotate(288)"/>
+            <circle cx="0" cy="0" r="5" fill="#EEE0FF"/>
+            <circle cx="0" cy="0" r="2.5" fill="#C0A0F0"/>
+          </g>
+          <g transform="translate(-20,6)">
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#FFB0CE" opacity="0.85"/>
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#FFB0CE" opacity="0.85" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#FFB0CE" opacity="0.85" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#FFB0CE" opacity="0.85" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#FFB0CE" opacity="0.85" transform="rotate(288)"/>
+            <circle cx="0" cy="0" r="3.5" fill="#FFE4F0"/>
+          </g>
+          <g transform="translate(20,6)">
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#B0D8FF" opacity="0.85"/>
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#B0D8FF" opacity="0.85" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#B0D8FF" opacity="0.85" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#B0D8FF" opacity="0.85" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-6" rx="4" ry="7" fill="#B0D8FF" opacity="0.85" transform="rotate(288)"/>
+            <circle cx="0" cy="0" r="3.5" fill="#E0F0FF"/>
+          </g>
+        </g>
+      </svg>
+      <p>みはってるよ🐾</p>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="search-row">
+    <div class="search-wrap">
+      <span>🔍</span>
+      <input type="text" id="searchInput" placeholder="食品名で検索...">
+    </div>
+    <button class="btn-add" onclick="openAdd()">＋ 追加</button>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="sort-row">
+    <select id="sortSelect" onchange="render()">
+      <option value="date-asc">期限が近い順</option>
+      <option value="date-desc">期限が遠い順</option>
+      <option value="name">名前順</option>
+      <option value="category">カテゴリ順</option>
+    </select>
+    <label><input type="checkbox" id="expiredOnly" onchange="render()"> 期限切れのみ</label>
+    <span class="count" id="countLabel"></span>
+  </div>
+
+  <div class="item-list" id="itemList"></div>
+
+  <div class="footer">🐾 コーギーが期限をみはってるよ！新鮮なうちに食べてね 🌸</div>
+</div>
+
+<!-- 追加・編集モーダル -->
+<div class="overlay" id="formOverlay" style="display:none" onclick="overlayClose(event,'formOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h2 id="formTitle">🌸 新しく追加</h2>
+    <!-- カメラ撮影ボタン -->
+    <button type="button" class="btn-camera" onclick="document.getElementById('photoInput').click()">
+      📷 写真を撮って自動入力
+    </button>
+    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="analyzePhoto(this)">
+    <div class="ocr-loading" id="ocrLoading">📷 読み取り中… しばらくお待ちください</div>
+    <div class="ocr-msg" id="ocrMsg"></div>
+
+    <div id="historyArea" style="display:none;margin-bottom:10px">
+      <div style="font-size:11px;color:#ce93d8;font-weight:bold;margin-bottom:6px">🕐 履歴から選ぶ</div>
+      <div id="historyBtns" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+    <label class="form-label">食品名 *</label>
+    <input class="form-input" type="text" id="fName" placeholder="例：牛乳、いちごジャム">
+    <label class="form-label">数量・単位</label>
+    <input class="form-input" type="text" id="fQty" placeholder="例：1L、2袋">
+    <label class="form-label">メモ</label>
+    <input class="form-input" type="text" id="fMemo" placeholder="例：開封済み、特売品">
+    <div class="form-row">
+      <div>
+        <label class="form-label">カテゴリ</label>
+        <select class="form-input" id="fCat" style="margin-bottom:0">
+          <option>冷蔵庫</option><option>パントリー</option><option>冷凍庫</option><option>その他</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">期限の種類</label>
+        <select class="form-input" id="fType" style="margin-bottom:0">
+          <option>賞味期限</option><option>消費期限</option>
+        </select>
+      </div>
+    </div>
+    <label class="form-label" style="margin-top:12px;display:block" id="fDateLabel">賞味期限 の日付 *</label>
+    <input class="form-input" type="date" id="fDate">
+    <div class="form-btns">
+      <button class="btn-cancel" onclick="closeForm()">キャンセル</button>
+      <button class="btn-save" id="btnSave" onclick="saveForm()">🌸 追加する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 削除確認 -->
+<div class="overlay center" id="delOverlay" style="display:none">
+  <div class="dialog">
+    <div class="dialog-icon">🗑️</div>
+    <p>このアイテムを削除しますか？</p>
+    <div class="dialog-btns">
+      <button class="btn-cancel2" onclick="closeDelete()">やめる</button>
+      <button class="btn-del2" onclick="confirmDelete()">削除する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var STORAGE_KEY='kogimama-food-v1';
+var INITIAL=[
+  {id:1,name:"いちごジャム",cat:"パントリー",type:"賞味期限",date:"2026-04-10",qty:"1瓶",memo:""},
+  {id:2,name:"牛乳",cat:"冷蔵庫",type:"消費期限",date:"2026-04-09",qty:"1L",memo:"低脂肪"},
+  {id:3,name:"チーズ",cat:"冷蔵庫",type:"賞味期限",date:"2026-04-20",qty:"1袋",memo:""},
+  {id:4,name:"パスタ",cat:"パントリー",type:"賞味期限",date:"2027-01-15",qty:"500g",memo:""},
+  {id:5,name:"冷凍餃子",cat:"冷凍庫",type:"賞味期限",date:"2026-06-30",qty:"2袋",memo:""},
+  {id:6,name:"ヨーグルト",cat:"冷蔵庫",type:"消費期限",date:"2026-04-08",qty:"1パック",memo:""}
+];
+var items=[];
+try{items=JSON.parse(localStorage.getItem(STORAGE_KEY))||INITIAL;}catch(e){items=INITIAL.slice();}
+var nextId=100,editId=null,deleteId=null,activeTab="すべて";
+
+function saveData(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(items));}catch(e){}}
+function today(){var d=new Date();d.setHours(0,0,0,0);return d;}
+function daysUntil(ds){var d=new Date(ds);d.setHours(0,0,0,0);return Math.ceil((d-today())/86400000);}
+function statusInfo(days){
+  if(days<0)  return{label:"期限切れ",     color:"#e57373",bg:"#fce4ec",emoji:"💀"};
+  if(days===0)return{label:"今日まで",     color:"#ef5350",bg:"#fce4ec",emoji:"⚠️"};
+  if(days<=3) return{label:"あと"+days+"日",color:"#f06292",bg:"#fce4ec",emoji:"🚨"};
+  if(days<=7) return{label:"あと"+days+"日",color:"#ba68c8",bg:"#f3e5f5",emoji:"⚡"};
+  if(days<=14)return{label:"あと"+days+"日",color:"#7986cb",bg:"#ede7f6",emoji:"📅"};
+  return       {label:"あと"+days+"日",    color:"#81c784",bg:"#e8f5e9",emoji:"✅"};
+}
+var catEmoji={"冷蔵庫":"🧊","パントリー":"🏠","冷凍庫":"❄️","その他":"📦"};
+var CATS=["すべて","冷蔵庫","パントリー","冷凍庫","その他"];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function render(){
+  var q=document.getElementById('searchInput').value.trim();
+  var sortBy=document.getElementById('sortSelect').value;
+  var expOnly=document.getElementById('expiredOnly').checked;
+  var list=items.slice();
+  if(activeTab!=="すべて")list=list.filter(function(i){return i.cat===activeTab;});
+  if(q)list=list.filter(function(i){return i.name.indexOf(q)>=0||(i.memo||'').indexOf(q)>=0;});
+  if(expOnly)list=list.filter(function(i){return daysUntil(i.date)<0;});
+  list.sort(function(a,b){
+    if(sortBy==="date-asc") return new Date(a.date)-new Date(b.date);
+    if(sortBy==="date-desc")return new Date(b.date)-new Date(a.date);
+    if(sortBy==="name")     return a.name.localeCompare(b.name,'ja');
+    if(sortBy==="category") return a.cat.localeCompare(b.cat,'ja');
+    return 0;
+  });
+
+  var expiringSoon=items.filter(function(i){var d=daysUntil(i.date);return d>=0&&d<=3;}).length;
+  var expired=items.filter(function(i){return daysUntil(i.date)<0;}).length;
+  document.getElementById('stats').innerHTML=
+    '<div class="stat-card"><div class="stat-num" style="color:#ce93d8">'+items.length+'</div><div class="stat-label">登録アイテム</div></div>'+
+    '<div class="stat-card'+(expiringSoon>0?' warn':'')+'"><div class="stat-num" style="color:#f06292">'+(expiringSoon>0?'⚡':'')+expiringSoon+'</div><div class="stat-label">もうすぐ期限</div></div>'+
+    '<div class="stat-card'+(expired>0?' warn':'')+'"><div class="stat-num" style="color:#e57373">'+(expired>0?'💀':'')+expired+'</div><div class="stat-label">期限切れ</div></div>';
+
+  document.getElementById('tabs').innerHTML=CATS.map(function(c){
+    return '<button class="tab'+(activeTab===c?' active':'')+'" onclick="setTab(\''+c+'\')">'+c+'</button>';
+  }).join('');
+
+  document.getElementById('countLabel').textContent=list.length+'件';
+
+  var el=document.getElementById('itemList');
+  if(list.length===0){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🌸</div>アイテムがありません</div>';
+    return;
+  }
+  el.innerHTML=list.map(function(item){
+    var days=daysUntil(item.date);
+    var st=statusInfo(days);
+    return '<div class="item-card'+(days<=3?' urgent':'')+'">'+
+      '<div class="item-icon">'+(catEmoji[item.cat]||'📦')+'</div>'+
+      '<div class="item-info">'+
+        '<div class="item-name-row">'+
+          '<span class="item-name">'+esc(item.name)+'</span>'+
+          '<span class="item-type '+(item.type==='消費期限'?'shohi':'shomi')+'">'+item.type+'</span>'+
+        '</div>'+
+        '<div class="item-meta">📅 '+item.date+(item.qty?' · '+esc(item.qty):'')+(item.memo?' · '+esc(item.memo):'')+
+        '</div>'+
+      '</div>'+
+      '<div class="status-badge" style="background:'+st.bg+';color:'+st.color+'">'+
+        '<div class="status-emoji">'+st.emoji+'</div>'+
+        '<div>'+st.label+'</div>'+
+      '</div>'+
+      '<div class="item-actions">'+
+        '<button class="btn-edit" onclick="openEdit('+item.id+')">編集</button>'+
+        '<button class="btn-del" onclick="openDelete('+item.id+')">削除</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function setTab(t){activeTab=t;render();}
+
+function openAdd(){
+  editId=null;
+  updateHistory();
+  document.getElementById('formTitle').textContent='🌸 新しく追加';
+  document.getElementById('fName').value='';
+  document.getElementById('fQty').value='';
+  document.getElementById('fMemo').value='';
+  document.getElementById('fCat').value='冷蔵庫';
+  document.getElementById('fType').value='賞味期限';
+  document.getElementById('fDate').value='';
+  document.getElementById('fDateLabel').textContent='賞味期限 の日付 *';
+  document.getElementById('btnSave').textContent='🌸 追加する';
+  document.getElementById('formOverlay').style.display='flex';
+}
+function openEdit(id){
+  var item=null;
+  for(var i=0;i<items.length;i++){if(items[i].id===id){item=items[i];break;}}
+  if(!item)return;
+  updateHistory();
+  editId=id;
+  document.getElementById('formTitle').textContent='✏️ 編集';
+  document.getElementById('fName').value=item.name;
+  document.getElementById('fQty').value=item.qty||'';
+  document.getElementById('fMemo').value=item.memo||'';
+  document.getElementById('fCat').value=item.cat;
+  document.getElementById('fType').value=item.type;
+  document.getElementById('fDate').value=item.date;
+  document.getElementById('fDateLabel').textContent=item.type+' の日付 *';
+  document.getElementById('btnSave').textContent='💾 保存する';
+  document.getElementById('formOverlay').style.display='flex';
+}
+function closeForm(){document.getElementById('formOverlay').style.display='none';}
+function saveForm(){
+  var name=document.getElementById('fName').value.trim();
+  var date=document.getElementById('fDate').value;
+  if(!name||!date)return;
+  var data={
+    name:name,date:date,
+    cat:document.getElementById('fCat').value,
+    type:document.getElementById('fType').value,
+    qty:document.getElementById('fQty').value.trim(),
+    memo:document.getElementById('fMemo').value.trim()
+  };
+  if(editId!==null){
+    for(var i=0;i<items.length;i++){
+      if(items[i].id===editId){items[i]=Object.assign({},items[i],data);break;}
+    }
+  }else{
+    items.push(Object.assign({id:nextId++},data));
+  }
+  saveData();closeForm();render();
+}
+function openDelete(id){deleteId=id;document.getElementById('delOverlay').style.display='flex';}
+function closeDelete(){deleteId=null;document.getElementById('delOverlay').style.display='none';}
+function confirmDelete(){
+  items=items.filter(function(i){return i.id!==deleteId;});
+  saveData();closeDelete();render();
+}
+function overlayClose(e,id){if(e.target.className.indexOf('overlay')>=0)document.getElementById(id).style.display='none';}
+document.getElementById('fType').addEventListener('change',function(){
+  document.getElementById('fDateLabel').textContent=this.value+' の日付 *';
+});
+document.getElementById('searchInput').addEventListener('input',render);
+
+// --- 履歴ボタン方式（iOS確実対応）---
+function updateHistory(){
+  var seen={}, hist=[];
+  var sorted=items.slice().reverse();
+  for(var i=0;i<sorted.length;i++){
+    var it=sorted[i];
+    if(!seen[it.name]){seen[it.name]=true;hist.push({name:it.name,cat:it.cat,qty:it.qty||''});}
+  }
+  var area=document.getElementById('historyArea');
+  var btns=document.getElementById('historyBtns');
+  if(hist.length===0){area.style.display='none';return;}
+  area.style.display='block';
+  btns.innerHTML=hist.slice(0,12).map(function(h){
+    var sn=h.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var sc=h.cat.replace(/'/g,"\\'");
+    var sq=(h.qty||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<button type="button" onclick="pickHistory(\''+sn+'\',\''+sc+'\',\''+sq+'\')" style="'+
+      'padding:6px 12px;border-radius:20px;border:1.5px solid #e1bee7;'+
+      'background:linear-gradient(135deg,#fce4ec,#f3e5f5);'+
+      'color:#7b1fa2;font-size:13px;cursor:pointer;font-family:inherit">'+
+      esc(h.name)+'</button>';
+  }).join('');
+}
+function pickHistory(name,cat,qty){
+  document.getElementById('fName').value=name;
+  document.getElementById('fCat').value=cat;
+  if(qty)document.getElementById('fQty').value=qty;
+}
+
+render();
+
+/* ── 📷 写真から自動入力 (OCR) ── */
+function analyzePhoto(input){
+  if(!input.files||!input.files[0])return;
+  var file=input.files[0];
+  input.value='';
+  document.getElementById('ocrLoading').style.display='block';
+  document.getElementById('ocrMsg').style.display='none';
+
+  var reader=new FileReader();
+  reader.onload=function(e){
+    // 画像を1000px以下にリサイズしてから送信
+    var img=new Image();
+    img.onload=function(){
+      var maxW=1000,maxH=1000,w=img.width,h=img.height;
+      if(w>maxW||h>maxH){
+        if(w/h>maxW/maxH){h=Math.round(h*maxW/w);w=maxW;}
+        else{w=Math.round(w*maxH/h);h=maxH;}
+      }
+      var canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      var b64=canvas.toDataURL('image/jpeg',0.85).split(',')[1];
+      var fd=new FormData();
+      fd.append('base64Image','data:image/jpeg;base64,'+b64);
+      fd.append('language','jpn');
+      fd.append('isOverlayRequired','false');
+      fd.append('OCREngine','2');
+      fetch('https://api.ocr.space/parse/image',{
+        method:'POST',headers:{'apikey':'helloworld'},body:fd
+      })
+      .then(function(r){return r.json();})
+      .then(function(data){
+        document.getElementById('ocrLoading').style.display='none';
+        if(data.ParsedResults&&data.ParsedResults[0]&&data.ParsedResults[0].ParsedText){
+          parseOcrText(data.ParsedResults[0].ParsedText);
+        }else{
+          showOcrMsg('文字を読み取れませんでした。写真を撮り直すか、手動で入力してください。');
+        }
+      })
+      .catch(function(){
+        document.getElementById('ocrLoading').style.display='none';
+        showOcrMsg('通信エラーが発生しました。ネット接続を確認してください。');
+      });
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showOcrMsg(msg){
+  var el=document.getElementById('ocrMsg');
+  el.textContent=msg;
+  el.style.display='block';
+}
+
+function parseOcrText(raw){
+  var lines=raw.split(/[\n\r]+/).map(function(l){return l.trim();}).filter(function(l){return l.length>1;});
+  var fullText=lines.join(' ');
+  var dateStr=null,dateType=null,nameStr=null;
+
+  // 賞味期限 / 消費期限 の種類を検出
+  if(/消費期限/.test(fullText)) dateType='消費期限';
+  else if(/賞味期限/.test(fullText)) dateType='賞味期限';
+
+  // 日付パターン（食品ラベルでよく使われる形式）
+  var pats=[
+    /(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/,   // 2026.12.31
+    /(\d{4})年(\d{1,2})月(\d{1,2})日/,              // 2026年12月31日
+    /[Rr令和]\s*(\d{1,2})[.\-\/年](\d{1,2})[.\-\/月](\d{1,2})/, // R8.12.31 / 令和8年
+    /\b(\d{2})[.](\d{2})[.](\d{2})\b/              // 26.12.31
+  ];
+  var reiwaOffset=[false,false,true,false];
+
+  for(var i=0;i<lines.length&&!dateStr;i++){
+    for(var p=0;p<pats.length&&!dateStr;p++){
+      var m=lines[i].match(pats[p]);
+      if(!m)continue;
+      var y=parseInt(m[1]),mo=parseInt(m[2]),d=parseInt(m[3]);
+      if(reiwaOffset[p]) y=2018+y;
+      else if(y<100) y=2000+y;
+      if(y>=2020&&y<=2040&&mo>=1&&mo<=12&&d>=1&&d<=31){
+        dateStr=y+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      }
+    }
+  }
+
+  // 商品名の候補（スキップするキーワードを除外）
+  var skip=/賞味期限|消費期限|製造|原材料|内容量|保存|カロリー|kcal|栄養|開封|要冷蔵|要冷凍|℃|株式会社|有限会社|〒|\d{3}-\d{4}|www\.|http/i;
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i];
+    if(line.length<2||line.length>30) continue;
+    if(/^[\d\s.\-\/年月日]+$/.test(line)) continue; // 数字・日付のみはスキップ
+    if(skip.test(line)) continue;
+    nameStr=line;
+    break;
+  }
+
+  // フォームに反映
+  var filled=[];
+  if(nameStr){document.getElementById('fName').value=nameStr;filled.push('食品名「'+nameStr+'」');}
+  if(dateStr){
+    document.getElementById('fDate').value=dateStr;
+    filled.push('日付 '+dateStr.replace(/-/g,'/'));
+  }
+  if(dateType){
+    document.getElementById('fType').value=dateType;
+    document.getElementById('fDateLabel').textContent=dateType+' の日付 *';
+    filled.push(dateType);
+  }
+
+  if(filled.length>0){
+    showOcrMsg('✅ 読み取り完了！'+filled.join('、')+' を入力しました。内容を確認してください。');
+  }else{
+    showOcrMsg('📝 読み取りましたが自動入力できませんでした。手動で入力してください。');
+  }
+}
+</script>
+</body>
+</html>

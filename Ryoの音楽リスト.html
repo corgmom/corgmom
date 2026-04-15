@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ryoの音楽">
+<meta name="theme-color" content="#f48fb1">
+<title>🎵 Ryoの音楽リスト</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(135deg,#fce4ec 0%,#f3e5f5 50%,#ede7f6 100%);min-height:100vh;font-family:'Hiragino Maru Gothic Pro','BIZ UDGothic',sans-serif;padding:12px 12px 60px}
+::-webkit-scrollbar{display:none}
+.wrap{max-width:600px;margin:0 auto}
+
+/* Header */
+.header{background:linear-gradient(135deg,#f48fb1,#ce93d8);border-radius:24px;padding:16px 20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(206,147,216,.4);display:flex;align-items:center;justify-content:space-between}
+.header-text h1{font-size:19px;font-weight:bold;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.15)}
+.header-text p{margin-top:6px;font-size:13px;color:rgba(255,255,255,.9);line-height:1.5}
+.header-corgi{text-align:center;flex-shrink:0}
+.header-corgi p{font-size:10px;color:rgba(255,255,255,.9);font-weight:bold;margin-top:2px}
+
+/* Artist card */
+.artist-card{background:#fff;border-radius:20px;padding:16px 18px;margin-bottom:16px;box-shadow:0 4px 16px rgba(206,147,216,.25);border:2px solid rgba(206,147,216,.2);display:flex;align-items:center;gap:14px}
+.artist-icon{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#f48fb1,#ce93d8);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.artist-info{flex:1}
+.artist-name{font-size:17px;font-weight:bold;color:#5d4037}
+.artist-desc{font-size:12px;color:#9c6fa4;margin-top:3px;line-height:1.4}
+.artist-stats{font-size:11px;color:#bdbdbd;margin-top:4px}
+.btn-suno{background:linear-gradient(135deg,#f48fb1,#ce93d8);color:#fff;border:none;border-radius:12px;padding:9px 16px;font-size:13px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block;box-shadow:0 2px 8px rgba(206,147,216,.4);flex-shrink:0}
+
+/* Section title */
+.section-title{font-size:13px;font-weight:bold;color:#9c6fa4;margin-bottom:10px;padding-left:4px;display:flex;align-items:center;gap:6px}
+
+/* Song card */
+.song-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.song-card{background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 2px 10px rgba(206,147,216,.18);border:1.5px solid rgba(206,147,216,.2);display:flex;align-items:center;gap:12px;text-decoration:none;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+.song-card:active{transform:scale(.98)}
+.song-card.top3{border-color:#f48fb1;background:linear-gradient(135deg,#fff9fb,#fdf6ff)}
+.song-rank{font-size:15px;font-weight:bold;min-width:28px;text-align:center}
+.rank-1{color:#f4c842}
+.rank-2{color:#b0b8c8}
+.rank-3{color:#cd8b4a}
+.rank-other{color:#ce93d8}
+.song-info{flex:1;min-width:0}
+.song-title{font-size:15px;font-weight:bold;color:#5d4037;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-meta{font-size:11px;color:#9c6fa4;margin-top:3px}
+.song-plays{font-size:11px;color:#bdbdbd;margin-top:2px}
+.song-arrow{font-size:16px;color:#ce93d8;flex-shrink:0}
+
+/* Note */
+.note-card{background:rgba(255,255,255,.7);border-radius:16px;padding:14px 16px;margin-bottom:16px;border:1.5px dashed #e1bee7}
+.note-card p{font-size:12px;color:#9c6fa4;line-height:1.7}
+.note-card strong{color:#c2185b}
+
+/* Footer */
+.footer{text-align:center;padding:10px;background:rgba(255,255,255,.6);border-radius:14px;font-size:12px;color:#ce93d8;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-text">
+      <h1>🎵 Ryoの音楽リスト</h1>
+      <p>自由とお金を愛する<br>ライオンアーティスト</p>
+    </div>
+    <div class="header-corgi">
+      <svg width="100" height="90" viewBox="0 0 320 290" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="160" cy="278" rx="88" ry="10" fill="rgba(200,160,220,0.22)"/>
+        <ellipse cx="160" cy="228" rx="88" ry="56" fill="#C8A070"/>
+        <ellipse cx="160" cy="236" rx="54" ry="42" fill="#FFF4E4"/>
+        <ellipse cx="160" cy="185" rx="44" ry="22" fill="#EDD8B8"/>
+        <rect x="96" y="248" width="30" height="24" rx="15" fill="#C8A070"/>
+        <ellipse cx="111" cy="272" rx="18" ry="9" fill="#B08858"/>
+        <ellipse cx="111" cy="274" rx="14" ry="6" fill="#FFF4E4"/>
+        <rect x="192" y="248" width="30" height="24" rx="15" fill="#C8A070"/>
+        <ellipse cx="207" cy="272" rx="18" ry="9" fill="#B08858"/>
+        <ellipse cx="207" cy="274" rx="14" ry="6" fill="#FFF4E4"/>
+        <path d="M 96,115 Q 58,58 76,10 Q 104,2 136,100 Z" fill="#A07848"/>
+        <path d="M 100,113 Q 68,62 82,18 Q 104,12 128,102 Z" fill="#F5C8B0"/>
+        <path d="M 224,115 Q 262,58 244,10 Q 216,2 184,100 Z" fill="#A07848"/>
+        <path d="M 220,113 Q 252,62 238,18 Q 216,12 192,102 Z" fill="#F5C8B0"/>
+        <ellipse cx="160" cy="128" rx="72" ry="65" fill="#C8A070"/>
+        <ellipse cx="160" cy="118" rx="22" ry="42" fill="#FFF4E4" opacity="0.75"/>
+        <ellipse cx="160" cy="158" rx="40" ry="28" fill="#FFF4E4"/>
+        <ellipse cx="122" cy="148" rx="16" ry="12" fill="#F0E4D0" opacity="0.6"/>
+        <ellipse cx="198" cy="148" rx="16" ry="12" fill="#F0E4D0" opacity="0.6"/>
+        <ellipse cx="128" cy="120" rx="15" ry="14" fill="white"/>
+        <ellipse cx="192" cy="120" rx="15" ry="14" fill="white"/>
+        <ellipse cx="131" cy="121" rx="11" ry="11" fill="#2A1600"/>
+        <ellipse cx="195" cy="121" rx="11" ry="11" fill="#2A1600"/>
+        <ellipse cx="131" cy="121" rx="8" ry="8" fill="#5A2E08"/>
+        <ellipse cx="195" cy="121" rx="8" ry="8" fill="#5A2E08"/>
+        <circle cx="136" cy="116" r="4" fill="white"/>
+        <circle cx="200" cy="116" r="4" fill="white"/>
+        <path d="M 114,117 Q 128,109 142,117" stroke="#2A1600" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 178,117 Q 192,109 206,117" stroke="#2A1600" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="160" cy="148" rx="14" ry="10" fill="#1A0E00"/>
+        <path d="M 144,160 Q 160,174 176,160" stroke="#906040" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="112" cy="136" rx="16" ry="10" fill="#FFB0C0" opacity="0.55"/>
+        <ellipse cx="208" cy="136" rx="16" ry="10" fill="#FFB0C0" opacity="0.55"/>
+        <g transform="translate(160,66)">
+          <ellipse cx="-38" cy="4" rx="14" ry="6" fill="#78C840" transform="rotate(-28 -38 4)"/>
+          <ellipse cx="38" cy="4" rx="14" ry="6" fill="#78C840" transform="rotate(28 38 4)"/>
+          <g transform="translate(-40,0)"><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE" transform="rotate(72)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFC8DC" transform="rotate(144)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFB0CE" transform="rotate(216)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFC8DC" transform="rotate(288)"/><circle cx="0" cy="0" r="5" fill="#FFE8F0"/></g>
+          <g transform="translate(0,-14)"><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898" transform="rotate(72)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFE4A8" transform="rotate(144)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFD898" transform="rotate(216)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#FFE4A8" transform="rotate(288)"/><circle cx="0" cy="0" r="5" fill="#FFF4D8"/></g>
+          <g transform="translate(40,0)"><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF" transform="rotate(72)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#D8BEFF" transform="rotate(144)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#C8AAFF" transform="rotate(216)"/><ellipse cx="0" cy="-9" rx="6" ry="10" fill="#D8BEFF" transform="rotate(288)"/><circle cx="0" cy="0" r="5" fill="#EEE0FF"/></g>
+        </g>
+      </svg>
+      <p>🎵 聴いてね🐾</p>
+    </div>
+  </div>
+
+  <!-- Artist Card -->
+  <div class="artist-card">
+    <div class="artist-icon">🦁</div>
+    <div class="artist-info">
+      <div class="artist-name">Ryo</div>
+      <div class="artist-desc">自由とお金を愛する歌多め<br>ライオンアーティスト</div>
+      <div class="artist-stats">👥 4.3K フォロワー　▶ 1.1M 再生　👍 13K</div>
+    </div>
+    <a class="btn-suno" href="https://suno.com/@ryorgakucho" onclick="window.location.href=this.href;return false;">Sunoで開く</a>
+  </div>
+
+  <!-- Note -->
+  <div class="note-card">
+    <p>🎧 曲をタップするとSunoが開いて再生できます。<br>
+    ※ Sunoにログイン済みだとワンタップで再生スタート🎵<br>
+    <strong>オフラインで聴くには</strong>→ Sunoで各曲の「⋮」→「Download」でMP3保存📥</p>
+  </div>
+
+  <!-- Song List -->
+  <div class="section-title">🎵 マイセレクト 16曲</div>
+  <div class="song-list">
+
+    <a class="song-card" href="https://suno.com/s/kv2acp9WMVMuSO0b" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">1</div>
+      <div class="song-info">
+        <div class="song-title">AI使えや</div>
+        <div class="song-meta">J-pop, rap-rock, motivation</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/s/1I2vFkHI7Ca3Cm2u" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">2</div>
+      <div class="song-info">
+        <div class="song-title">全てが夢（すべてがドリーム）</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/c42935f3-2755-45f3-957d-3a3dddbbedf8" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">3</div>
+      <div class="song-info">
+        <div class="song-title">美味しいお寿司食べようよ</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/dbf103fc-575a-45fe-9e38-2ebc8a48c539" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">4</div>
+      <div class="song-info">
+        <div class="song-title">自分の価値観</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/0513abf9-c7cc-428d-9e6e-b26171cc3eeb" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">5</div>
+      <div class="song-info">
+        <div class="song-title">おいでよリベシティ</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/b5f2f94f-4e14-446a-925e-70e6e11b6a0f" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">6</div>
+      <div class="song-info">
+        <div class="song-title">はよ売りや！</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/1a5e4dc7-7ee0-46b0-aa40-54f84dfda8bf" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">7</div>
+      <div class="song-info">
+        <div class="song-title">先出が勝ちや！</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/55af058b-67ae-46f1-a777-927521dcfc7d" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">8</div>
+      <div class="song-info">
+        <div class="song-title">あなたはもう、損してる</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/eea97387-a03a-42e5-bcf6-b92869a299a7" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">9</div>
+      <div class="song-info">
+        <div class="song-title">でも、でも、だって</div>
+        <div class="song-meta">rap, hiphop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/a7dd2eba-08e4-4b03-8e45-d22e58064b52" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">10</div>
+      <div class="song-info">
+        <div class="song-title">乱高下</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/8f512c73-076f-43b5-b0a3-b31b1e78dace" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">11</div>
+      <div class="song-info">
+        <div class="song-title">マイホームレンタルか買うか</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/ed663f08-8425-44e1-bf0c-92e2864aa158" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">12</div>
+      <div class="song-info">
+        <div class="song-title">話聞いてた？</div>
+        <div class="song-meta">hiphop, rap</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/2c274aaf-e270-46d0-a500-e9a420ea6359" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">13</div>
+      <div class="song-info">
+        <div class="song-title">ワンダーランド</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/96956618-b921-461e-92b9-089ed87b8a1b" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">14</div>
+      <div class="song-info">
+        <div class="song-title">おやすみリベシティ</div>
+        <div class="song-meta">slow, ギター</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/33612aae-39e0-4d73-a5db-d10d37af2a9f" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">15</div>
+      <div class="song-info">
+        <div class="song-title">ダーリン</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+    <a class="song-card" href="https://suno.com/song/b3ec7496-4254-41df-9d15-aea091e61bd0" onclick="window.location.href=this.href;return false;">
+      <div class="song-rank rank-other">16</div>
+      <div class="song-info">
+        <div class="song-title">ハエとおすぎ</div>
+        <div class="song-meta">pop</div>
+      </div>
+      <div class="song-arrow">▶</div>
+    </a>
+
+  </div>
+
+  <div class="footer">🦁 Ryo (@ryorgakucho) の楽曲一覧<br>🐾 曲をタップしてSunoで再生しよう！</div>
+</div>
+</body>
+</html>
